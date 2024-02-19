@@ -68,27 +68,50 @@ def get_data_with_cache(
 
 def load_data_to_bq(
         data: pd.DataFrame,
-        gcp_project:str,
-        bq_dataset:str,
+        gcp_project: str,
+        bq_dataset: str,
         table: str,
         truncate: bool
     ) -> None:
     """
-    - Save the DataFrame to BigQuery
-    - Empty the table beforehand if `truncate` is True, append otherwise
+    Save the DataFrame to BigQuery.
+    Empty the table beforehand if `truncate` is True, append otherwise.
+
+    Parameters:
+    - data: The pandas DataFrame to save.
+    - gcp_project: The Google Cloud Platform project ID.
+    - bq_dataset: The BigQuery dataset name.
+    - table: The BigQuery table name.
+    - truncate: If True, the table is emptied before the data is loaded; if False, data is appended.
     """
 
-    assert isinstance(data, pd.DataFrame)
+    # Ensure the input is a pandas DataFrame
+    assert isinstance(data, pd.DataFrame), "Input data must be a pandas DataFrame."
+
+    # Construct the full table name
     full_table_name = f"{gcp_project}.{bq_dataset}.{table}"
     print(Fore.BLUE + f"\nSave data to BigQuery @ {full_table_name}...:" + Style.RESET_ALL)
 
-    # Load data onto full_table_name
+    # Adjust column names to meet BigQuery naming requirements
+    data.columns = [
+        f"_{column}" if not str(column)[0].isalpha() and not str(column)[0] == "_" else str(column)
+        for column in data.columns
+    ]
 
-    # 🎯 HINT for "*** TypeError: expected bytes, int found":
-    # After preprocessing the data, your original column names are gone (print it to check),
-    # so ensure that your column names are *strings* that start with either 
-    # a *letter* or an *underscore*, as BQ does not accept anything else
+    # Initialize the BigQuery client
+    client = bigquery.Client(project=gcp_project)
 
-    pass  # YOUR CODE HERE
+    # Define the job configuration based on the `truncate` parameter
+    write_mode = bigquery.WriteDisposition.WRITE_TRUNCATE if truncate else bigquery.WriteDisposition.WRITE_APPEND
+    job_config = bigquery.LoadJobConfig(write_disposition=write_mode)
 
-    print(f"✅ Data saved to bigquery, with shape {data.shape}")
+    # Display action being taken based on truncate flag
+    action = "Truncating and writing" if truncate else "Appending"
+    print(f"\n{action} to {full_table_name} ({data.shape[0]} rows)")
+
+    # Load the DataFrame into BigQuery
+    job = client.load_table_from_dataframe(data, full_table_name, job_config=job_config)
+    result = job.result()  # Wait for the job to complete
+
+    # Confirmation message
+    print(f":white_check_mark: Data successfully {'written to' if truncate else 'appended in'} BigQuery, with shape {data.shape}")
