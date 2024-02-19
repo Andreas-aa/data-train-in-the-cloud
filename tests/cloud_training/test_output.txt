@@ -1,7 +1,7 @@
 ============================= test session starts ==============================
-platform linux -- Python 3.10.6, pytest-8.0.0, pluggy-1.4.0 -- /home/adata/.pyenv/versions/3.10.6/envs/taxifare-env/bin/python3.10
+platform linux -- Python 3.10.6, pytest-8.0.1, pluggy-1.4.0 -- /home/adata/.pyenv/versions/3.10.6/envs/taxifare-env/bin/python3.10
 cachedir: .pytest_cache
-rootdir: /home/adata/code/Andreas-aa/07-ML-Ops/02-Cloud-training/data-train-in-the-cloud/tests
+rootdir: /home/adata/data-train-in-the-cloud/tests
 configfile: pytest_kitt.ini
 collecting ... collected 9 items
 
@@ -13,24 +13,6 @@ tests/cloud_training/test_main.py::TestMain::test_route_train[local] PASSED [ 55
 tests/cloud_training/test_main.py::TestMain::test_route_train[gcs] PASSED [ 66%]
 tests/cloud_training/test_main.py::TestMain::test_route_evaluate PASSED  [ 77%]
 tests/cloud_training/test_main.py::TestMain::test_route_pred PASSED      [ 88%]
-tests/cloud_training/test_vm.py::test_i_am_a_vm FAILED                   [100%]
+tests/cloud_training/test_vm.py::test_i_am_a_vm PASSED                   [100%]
 
-=================================== FAILURES ===================================
-________________________________ test_i_am_a_vm ________________________________
-
-    def test_i_am_a_vm():
-        """
-        Test that this code is being run from a Google VM named as per env variable 'INSTANCE'
-        """
-    
->       assert platform.node() == INSTANCE, f"You should be running from your instance named '{INSTANCE}'."
-E       AssertionError: You should be running from your instance named 'taxi-instance'.
-E       assert 'DESKTOP-MJ0EV5S' == 'taxi-instance'
-E         
-E         - taxi-instance
-E         + DESKTOP-MJ0EV5S
-
-tests/cloud_training/test_vm.py:9: AssertionError
-=========================== short test summary info ============================
-FAILED tests/cloud_training/test_vm.py::test_i_am_a_vm - AssertionError: You ...
-================== 1 failed, 8 passed, 18 warnings in 10.33s ===================
+================== 9 passed, 18 warnings in 68.29s (0:01:08) ===================
